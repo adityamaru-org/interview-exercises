@@ -104,6 +104,13 @@ jobs:
           DB_STRESS_WORKERS: auto
           DB_POOL_SIZE: 4
 
+      - name: Keep runner alive for SSH debugging
+        if: failure()
+        run: |
+          echo "Integration tests failed. Keeping this runner alive for SSH debugging."
+          echo "Use the SSH command from the Blacksmith setup output above."
+          sleep 1800
+
   docker-build:
     name: Docker build (${{ matrix.platform }})
     runs-on: ${{ matrix.runner }}
