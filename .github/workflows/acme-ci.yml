@@ -69,8 +69,8 @@ jobs:
       - run: npm ci
       - run: npm run profile:cpu
         env:
-          PROFILE_CPU_TASKS: 64
-          PROFILE_CPU_ITERATIONS: 25000000
+          PROFILE_CPU_TASKS: 256
+          PROFILE_CPU_ITERATIONS: 6250000
           PROFILE_CPU_WORKERS: 32
 
   unit-tests:
