@@ -69,9 +69,9 @@ jobs:
       - run: npm ci
       - run: npm run profile:cpu
         env:
-          PROFILE_CPU_TASKS: 32
-          PROFILE_CPU_ITERATIONS: 750000000
-          PROFILE_CPU_WORKERS: 16
+          PROFILE_CPU_TASKS: 64
+          PROFILE_CPU_ITERATIONS: 25000000
+          PROFILE_CPU_WORKERS: 32
 
   unit-tests:
     name: Unit tests shard ${{ matrix.shard }}/8
