@@ -25,13 +25,26 @@ function sleep(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
+function assignBalancedShards(manifest, total) {
+  const shards = Array.from({ length: total }, () => ({ durationMs: 0, tests: [] }));
+  const sortedTests = [...manifest].sort((left, right) => right.durationMs - left.durationMs);
+
+  for (const test of sortedTests) {
+    shards.sort((left, right) => left.durationMs - right.durationMs);
+    shards[0].tests.push(test);
+    shards[0].durationMs += test.durationMs;
+  }
+
+  return shards;
+}
+
 async function main() {
   const { index, total } = parseShard(process.argv.slice(2));
   const manifestPath = path.join(__dirname, '..', 'fixtures', 'test-manifest.json');
   const manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
   const scale = Number(process.env.TEST_DURATION_SCALE || 0.15);
 
-  const tests = manifest.filter((_, idx) => idx % total === index - 1);
+  const tests = assignBalancedShards(manifest, total)[index - 1].tests;
   const expectedDuration = tests.reduce((sum, test) => sum + test.durationMs, 0);
 
   console.log(`running unit test shard ${index}/${total}`);
