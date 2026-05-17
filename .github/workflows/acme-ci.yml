@@ -18,7 +18,7 @@ defaults:
 jobs:
   fraud-model-benchmark:
     name: Fraud model benchmark
-    runs-on: ubuntu-latest-4-cores
+    runs-on: blacksmith-16vcpu-ubuntu-2404
     steps:
       - uses: actions/checkout@v4
 
@@ -37,7 +37,7 @@ jobs:
 
   unit-tests:
     name: Unit tests shard ${{ matrix.shard }}/8
-    runs-on: ubuntu-latest-8-cores
+    runs-on: blacksmith-8vcpu-ubuntu-2404
     strategy:
       fail-fast: false
       matrix:
@@ -56,7 +56,7 @@ jobs:
 
   integration-tests:
     name: Integration tests
-    runs-on: ubuntu-latest-16-cores
+    runs-on: blacksmith-16vcpu-ubuntu-2404
     steps:
       - uses: actions/checkout@v4
 
@@ -76,8 +76,8 @@ jobs:
         run: npm run test:integration
         env:
           DATABASE_URL: postgresql://acme:acme@localhost:55432/acme_test
-          INTEGRATION_WORKERS: auto
-          APP_DB_POOL_SIZE: 4
+          INTEGRATION_WORKERS: 8
+          APP_DB_POOL_SIZE: 2
 
   docker-build:
     name: Docker build (${{ matrix.platform }})
@@ -88,10 +88,10 @@ jobs:
         include:
           - platform: linux/amd64
             tag-suffix: linux-amd64
-            runner: ubuntu-latest-4-cores
+            runner: blacksmith-4vcpu-ubuntu-2404
           - platform: linux/arm64
             tag-suffix: linux-arm64
-            runner: ubuntu-latest-4-cores
+            runner: blacksmith-4vcpu-ubuntu-2404-arm
     steps:
       - uses: actions/checkout@v4
 
@@ -104,9 +104,9 @@ jobs:
       - run: npm ci
       - run: npm run docker:arch-check
 
-      - uses: docker/setup-buildx-action@v3
+      - uses: useblacksmith/setup-docker-builder@v1
 
-      - uses: docker/build-push-action@v6
+      - uses: useblacksmith/build-push-action@v2
         with:
           context: solutions-engineering/migration-lab
           file: solutions-engineering/migration-lab/Dockerfile
